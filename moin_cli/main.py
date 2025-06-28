@@ -1,62 +1,83 @@
 import click
-from xmlrpc_client import MoinMoinClient
-from mcp_server import MCPServer
+from getpass import getpass
+from moin_cli.xmlrpc_client import WikiRPCClient
 
 @click.group()
 def main():
-    """A Python CLI for MoinMoin wiki servers via XML-RPC with MCP server support."""
+    """A Python CLI for MoinMoin wiki servers via XML-RPC with MCP server support.
+    
+    Supports authentication token management and page operations.
+    """
     pass
 
-# XML-RPC Client Commands
-@main.group()
-def client():
-    """MoinMoin XML-RPC client operations."""
-    pass
+@main.command()
+def auth():
+    """Initial setup and authentication for MoinMoin wiki.
+    
+    Prompts for server URL, username and password to create initial configuration.
+    """
+    try:
+        from moin_cli.config import save_config
+        from pathlib import Path
+        import os
 
-@client.command()
-@click.argument('url')
+        # Create config directory if it doesn't exist
+        config_dir = Path.home() / '.moin'
+        config_dir.mkdir(exist_ok=True)
+
+        # Prompt for configuration
+        alias = click.prompt("Enter wiki name/alias (e.g. local, production)")
+        url = click.prompt("Enter wiki server URL (e.g. http://localhost:8080)")
+        username = click.prompt("Enter wiki username")
+        password = getpass("Enter wiki password: ")
+
+        # Create client and get token
+        endpoint = f"{url}/?action=xmlrpc2"
+        client = WikiRPCClient(endpoint)
+        token = client.get_auth_token(username, password)
+        
+        # Save complete config with sections
+        config = {
+            'wikis': {
+                alias: {
+                    'url': url,
+                    'username': username,
+                    'token': token
+                }
+            }
+        }
+        save_config(config)
+        click.echo("Configuration saved successfully")
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+
+@main.command()
 @click.argument('pagename')
-def read(url, pagename):
-    """Read a wiki page."""
-    client = MoinMoinClient(url)
-    click.echo(client.read_page(pagename))
+@click.option('--wiki', '-w', help='Wiki alias to use')
+def get(pagename, wiki):
+    """Get a page's content."""
+    try:
+        client = WikiRPCClient.from_config(wiki)
+        content = client.get_page(pagename)
+        click.echo(content)
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
 
-@client.command()
-@click.argument('url')
+@main.command()
 @click.argument('pagename')
 @click.argument('content')
-def write(url, pagename, content):
-    """Write to a wiki page."""
-    client = MoinMoinClient(url)
-    if client.write_page(pagename, content):
-        click.echo(f"Page '{pagename}' updated successfully")
-
-@client.command()
-@click.argument('url')
-def list(url):
-    """List all wiki pages."""
-    client = MoinMoinClient(url)
-    for page in client.list_pages():
-        click.echo(page)
-
-@client.command()
-@click.argument('url')
-@click.argument('query')
-def search(url, query):
-    """Search wiki pages."""
-    client = MoinMoinClient(url)
-    for page in client.search(query):
-        click.echo(page)
-
-# MCP Server Commands
-@main.command()
-@click.option('--host', default='localhost', help='Server host')
-@click.option('--port', default=8000, help='Server port')
-def serve(host, port):
-    """Start the MCP server."""
-    server = MCPServer(host, port)
-    click.echo(f"Starting MCP server on {host}:{port}")
-    server.start()
+@click.option('--wiki', '-w', help='Wiki alias to use')
+def put(pagename, content, wiki):
+    """Update a page's content."""
+    try:
+        client = WikiRPCClient.from_config(wiki)
+        success = client.put_page(pagename, content, alias=wiki)
+        if success:
+            click.echo(f"Successfully updated {pagename}")
+        else:
+            click.echo(f"Failed to update {pagename}", err=True)
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
 
 if __name__ == "__main__":
     main()
