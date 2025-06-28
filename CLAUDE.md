@@ -108,6 +108,63 @@ This approach keeps the repository clean while leveraging GitHub's excellent pro
 - Use descriptive commit messages with issue references (`#N`)
 - Include tests for new functionality
 - Update documentation with code changes
+- **Use `uv run` for all Python commands** to ensure project-specific environment
+
+## Python Environment Management with UV
+
+**Important**: Always use `uv run` for Python commands to ensure project-specific dependency isolation and consistency.
+
+### Core UV Commands
+```bash
+# ✅ GOOD: Project-aware Python execution
+uv run python -c "import moin_cli; print('✅ Import works')"
+uv run python -m pytest
+uv run python -m mypy moin_cli/
+uv run python script.py
+
+# ❌ BAD: System/global Python (inconsistent dependencies)
+python -c "import moin_cli"
+python -m pytest
+python script.py
+```
+
+### Benefits of UV Run
+1. **Dependency Isolation** - Uses project's exact dependencies from pyproject.toml
+2. **Consistency** - Same environment across team members and CI/CD
+3. **Automatic Setup** - Creates/activates virtual environment automatically
+4. **Version Management** - Ensures correct Python version per project
+
+### Common Development Patterns
+```bash
+# Testing imports
+uv run python -c "import moin_cli.config; print('Config package works')"
+
+# Running tests
+uv run pytest
+uv run pytest tests/test_config.py -v
+
+# Type checking
+uv run mypy moin_cli/
+
+# Code formatting
+uv run black moin_cli/
+uv run ruff check moin_cli/
+
+# Running the CLI
+uv run moin --help
+uv run python -m moin_cli.main
+
+# Installing development dependencies
+uv sync --group dev
+```
+
+### Integration with Development Tools
+- **AIDER**: Continue using `aider` directly (it manages its own environment)
+- **Git hooks**: Use `uv run` in pre-commit hooks
+- **CI/CD**: Use `uv run` in GitHub Actions workflows
+- **IDE**: Configure IDE to use `uv run` for Python interpreter
+
+This ensures all development happens in a consistent, isolated environment with the correct dependencies.
 
 ## Branch-Issue Linking for Session Continuity
 
