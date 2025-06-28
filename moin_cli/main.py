@@ -26,6 +26,7 @@ def auth():
         config_dir.mkdir(exist_ok=True)
 
         # Prompt for configuration
+        alias = click.prompt("Enter wiki name/alias (e.g. local, production)")
         url = click.prompt("Enter wiki server URL (e.g. http://localhost:8080)")
         username = click.prompt("Enter wiki username")
         password = getpass("Enter wiki password: ")
@@ -35,11 +36,15 @@ def auth():
         client = WikiRPCClient(endpoint)
         token = client.get_auth_token(username, password)
         
-        # Save complete config
+        # Save complete config with sections
         config = {
-            'url': url,
-            'username': username,
-            'token': token
+            'wikis': {
+                alias: {
+                    'url': url,
+                    'username': username,
+                    'token': token
+                }
+            }
         }
         save_config(config)
         click.echo("Configuration saved successfully")
@@ -48,10 +53,11 @@ def auth():
 
 @main.command()
 @click.argument('pagename')
-def get(pagename):
+@click.option('--wiki', '-w', help='Wiki alias to use')
+def get(pagename, wiki):
     """Get a page's content."""
     try:
-        client = WikiRPCClient.from_config()
+        client = WikiRPCClient.from_config(wiki)
         content = client.get_page(pagename)
         click.echo(content)
     except Exception as e:
@@ -60,11 +66,12 @@ def get(pagename):
 @main.command()
 @click.argument('pagename')
 @click.argument('content')
-def put(pagename, content):
+@click.option('--wiki', '-w', help='Wiki alias to use')
+def put(pagename, content, wiki):
     """Update a page's content."""
     try:
-        client = WikiRPCClient.from_config()
-        success = client.put_page(pagename, content)
+        client = WikiRPCClient.from_config(wiki)
+        success = client.put_page(pagename, content, alias=wiki)
         if success:
             click.echo(f"Successfully updated {pagename}")
         else:

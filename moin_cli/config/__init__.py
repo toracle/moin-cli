@@ -21,7 +21,24 @@ def load_config() -> dict:
     with open(config_path, 'r') as f:
         config = toml.load(f)
     
-    if 'url' not in config or 'username' not in config:
-        raise ValueError("Config must contain 'url' and 'username' keys")
+    if 'wikis' not in config:
+        raise ValueError("Config must contain 'wikis' section")
     
     return config
+
+def get_wiki_config(alias: str = None) -> dict:
+    """Get configuration for a specific wiki alias"""
+    config = load_config()
+    wikis = config['wikis']
+    
+    if alias is None:
+        # Return first wiki if no alias specified
+        if not wikis:
+            raise ValueError("No wikis configured")
+        alias = next(iter(wikis.keys()))
+    
+    if alias not in wikis:
+        available = ', '.join(wikis.keys())
+        raise ValueError(f"Wiki '{alias}' not found. Available: {available}")
+    
+    return wikis[alias]

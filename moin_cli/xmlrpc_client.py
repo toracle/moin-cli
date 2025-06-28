@@ -10,11 +10,11 @@ class WikiRPCClient:
         self.server = xmlrpc.client.ServerProxy(endpoint)
 
     @classmethod
-    def from_config(cls, config_path: str = "~/.moin/config.toml") -> "WikiRPCClient":
+    def from_config(cls, alias: str = None) -> "WikiRPCClient":
         """Create client from config file."""
-        config_file = Path(config_path).expanduser()
-        config = toml.load(config_file)
-        endpoint = f"{config['url']}/?action=xmlrpc2"
+        from moin_cli.config import get_wiki_config
+        wiki_config = get_wiki_config(alias)
+        endpoint = f"{wiki_config['url']}/?action=xmlrpc2"
         return cls(endpoint)
 
     def get_page(self, pagename: str) -> str:
@@ -25,17 +25,19 @@ class WikiRPCClient:
         """Get authentication token from MoinMoin server."""
         return self.server.getAuthToken(username, password)
 
-    def put_page(self, pagename: str, content: str, token: Optional[str] = None) -> bool:
+    def put_page(self, pagename: str, content: str, token: Optional[str] = None, alias: str = None) -> bool:
         """Update page content using WikiRPC v2 putPage with authentication.
         
         Args:
             pagename: Name of page to update
             content: New page content
             token: Optional auth token. If None, will try to load from config.
+            alias: Wiki alias to use for token lookup
         """
         if token is None:
-            config = load_config()
-            token = config.get('token')
+            from moin_cli.config import get_wiki_config
+            wiki_config = get_wiki_config(alias)
+            token = wiki_config.get('token')
             if token is None:
                 raise ValueError("No auth token provided and none found in config")
 
