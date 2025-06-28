@@ -20,6 +20,7 @@
 
 3. **Pull Request Descriptions** - Implementation documentation
    - Detailed description of changes
+   - **Explicit issue linking** with "Related Issue: Closes #N" or "Fixes #N"
    - Link to related issues
    - Implementation approach explanation
    - Testing notes
@@ -69,6 +70,7 @@
 
 3. **Review Phase**:
    - Create PR with detailed description
+   - **Explicitly link to related issue** using "Closes #N", "Fixes #N", or "Related Issue: #N"
    - Link to related issue(s)
    - Use PR comments for code-specific discussions
 
@@ -148,6 +150,7 @@ This approach keeps the repository clean while leveraging GitHub's excellent pro
 **3. Pull Request Description & Comments - Solution Implementation**
 
 **What belongs in PR:**
+- 🔧 **Explicit issue linking** at the top of description ("Related Issue: Closes #N")
 - 🔧 **Implementation approach** and technical decisions
 - 🔧 **Detailed progress updates** and session logs
 - 🔧 **Code-specific discussions** and technical blockers
@@ -188,6 +191,11 @@ Pydantic provides better validation for URL/timeout fields.
 
 **✅ GOOD: PR Description (Solution Space)**
 ```markdown
+## Summary
+Implements the configuration management system as specified in **Issue #1**.
+
+**Related Issue**: Closes #1
+
 ## Implementation Approach
 
 - **Models**: Using Pydantic for validation and serialization
