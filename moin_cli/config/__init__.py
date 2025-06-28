@@ -21,24 +21,27 @@ def load_config() -> dict:
     with open(config_path, 'r') as f:
         config = toml.load(f)
     
-    if 'wikis' not in config:
-        raise ValueError("Config must contain 'wikis' section")
+    if 'settings' not in config:
+        raise ValueError("Config must contain 'settings' section")
+    if 'default_server' not in config['settings']:
+        raise ValueError("Config must specify 'default_server' in [settings]")
     
     return config
 
 def get_wiki_config(alias: str = None) -> dict:
     """Get configuration for a specific wiki alias"""
     config = load_config()
-    wikis = config['wikis']
     
     if alias is None:
-        # Return first wiki if no alias specified
-        if not wikis:
-            raise ValueError("No wikis configured")
-        alias = next(iter(wikis.keys()))
+        alias = config['settings']['default_server']
     
-    if alias not in wikis:
-        available = ', '.join(wikis.keys())
-        raise ValueError(f"Wiki '{alias}' not found. Available: {available}")
+    server_key = f"server.{alias}"
+    if server_key not in config:
+        available = [k.split('.')[1] for k in config.keys() if k.startswith('server.')]
+        raise ValueError(f"Server '{alias}' not found. Available: {', '.join(available)}")
     
-    return wikis[alias]
+    server_config = config[server_key]
+    if 'name' not in server_config:
+        server_config['name'] = alias  # Ensure name is set
+    
+    return server_config

@@ -37,7 +37,7 @@ class WikiRPCClient:
         if token is None:
             from moin_cli.config import get_wiki_config
             wiki_config = get_wiki_config(alias)
-            token = wiki_config.get('token')
+            token = wiki_config.get('access_token')
             if token is None:
                 raise ValueError("No auth token provided and none found in config")
 
