@@ -12,11 +12,11 @@ def test_get_recent_changes_method():
     """Test that get_recent_changes method works correctly."""
     # Mock the XML-RPC server
     mock_server = Mock()
-    # Simulate getRecentChanges returning list of [pagename, timestamp] pairs
+    # Simulate getRecentChanges returning list of dictionaries (actual format)
     mock_server.getRecentChanges.return_value = [
-        ["HomePage", 1234567890],
-        ["WikiPage", 1234567800],
-        ["SandBox", 1234567700]
+        {"name": "HomePage", "lastModified": "2024-01-01", "version": 1, "author": "user"},
+        {"name": "WikiPage", "lastModified": "2024-01-01", "version": 2, "author": "user"},
+        {"name": "SandBox", "lastModified": "2024-01-01", "version": 3, "author": "user"}
     ]
     
     with patch('xmlrpc.client.ServerProxy', return_value=mock_server):
@@ -25,12 +25,13 @@ def test_get_recent_changes_method():
         
         assert isinstance(pages, list)
         assert pages == ["HomePage", "WikiPage", "SandBox"]
-        # Verify timestamp calculation was done
+        # Verify datetime calculation was done
         mock_server.getRecentChanges.assert_called_once()
-        # Check that the timestamp argument is reasonable (within last 7 days)
+        # Check that the datetime argument is reasonable (within last 7 days)
         call_args = mock_server.getRecentChanges.call_args[0]
         assert len(call_args) == 1
-        assert isinstance(call_args[0], int)
+        from datetime import datetime
+        assert isinstance(call_args[0], datetime)
 
 
 def test_recent_command_basic():
@@ -48,8 +49,8 @@ def test_recent_command_basic():
     # Mock XML-RPC server
     mock_server = Mock()
     mock_server.getRecentChanges.return_value = [
-        ["HomePage", 1234567890],
-        ["RecentPage", 1234567800]
+        {"name": "HomePage", "lastModified": "2024-01-01", "version": 1, "author": "user"},
+        {"name": "RecentPage", "lastModified": "2024-01-01", "version": 2, "author": "user"}
     ]
     
     with patch('moin_cli.config.get_wiki_config', return_value=server_config), \
@@ -75,7 +76,7 @@ def test_recent_command_custom_days():
     )
     
     mock_server = Mock()
-    mock_server.getRecentChanges.return_value = [["TestPage", 1234567890]]
+    mock_server.getRecentChanges.return_value = [{"name": "TestPage", "lastModified": "2024-01-01", "version": 1, "author": "user"}]
     
     with patch('moin_cli.config.get_wiki_config', return_value=server_config), \
          patch('xmlrpc.client.ServerProxy', return_value=mock_server):

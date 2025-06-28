@@ -49,12 +49,21 @@ class WikiRPCClient:
         Returns:
             List of page names that were recently changed
         """
-        # MoinMoin expects timestamp in seconds since epoch
-        import time
-        timestamp = int(time.time()) - (days * 24 * 60 * 60)
-        changes = self.server.getRecentChanges(timestamp)
-        # Return just page names without timestamps
-        return [page for page, _ in changes]
+        from datetime import datetime, timedelta
+        since = datetime.utcnow() - timedelta(days=days)
+        changes = self.server.getRecentChanges(since)
+        
+        # Handle different response formats:
+        if not changes:
+            return []
+        # If first item is a dictionary with 'name' field
+        if isinstance(changes[0], dict) and 'name' in changes[0]:
+            return [change['name'] for change in changes]
+        # If first item is a tuple (pagename, timestamp)
+        if isinstance(changes[0], (tuple, list)) and len(changes[0]) == 2:
+            return [page for page, _ in changes]
+        # If just page names are returned
+        return list(changes)
 
     def put_page(self, pagename: str, content: str, token: Optional[str] = None, alias: str = None) -> bool:
         """Update page content using WikiRPC v2 putPage with authentication.
