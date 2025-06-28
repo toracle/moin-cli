@@ -19,3 +19,7 @@ class WikiRPCClient:
     def get_page(self, pagename: str) -> str:
         """Get page content using WikiRPC v2 getPage."""
         return self.server.getPage(pagename)
+
+    def put_page(self, pagename: str, content: str) -> bool:
+        """Update page content using WikiRPC v2 putPage."""
+        return self.server.putPage(pagename, content)
