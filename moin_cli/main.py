@@ -94,5 +94,18 @@ def list(server):
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
 
+@main.command()
+@click.argument('query')
+@click.option('--server', '-s', help='Wiki server alias to use')
+def search(query, server):
+    """Search for pages containing the query text."""
+    try:
+        client = WikiRPCClient.from_config(server)
+        results = client.search_pages(query)
+        for page in results:
+            click.echo(page)
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+
 if __name__ == "__main__":
     main()

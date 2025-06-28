@@ -29,6 +29,17 @@ class WikiRPCClient:
         """Get list of all page names from the wiki using WikiRPC v2 getAllPages."""
         return self.server.getAllPages()
 
+    def search_pages(self, query: str) -> list[str]:
+        """Search for pages containing the query string using WikiRPC v2 searchPages.
+        
+        Args:
+            query: Search string to look for in page contents
+            
+        Returns:
+            List of page names that match the search
+        """
+        return self.server.searchPages(query)
+
     def put_page(self, pagename: str, content: str, token: Optional[str] = None, alias: str = None) -> bool:
         """Update page content using WikiRPC v2 putPage with authentication.
         
