@@ -40,6 +40,22 @@ class WikiRPCClient:
         """
         return self.server.searchPages(query)
 
+    def get_recent_changes(self, days: int = 7) -> list[str]:
+        """Get list of recently changed pages using WikiRPC v2 getRecentChanges.
+        
+        Args:
+            days: Number of days to look back for changes (default: 7)
+            
+        Returns:
+            List of page names that were recently changed
+        """
+        # MoinMoin expects timestamp in seconds since epoch
+        import time
+        timestamp = int(time.time()) - (days * 24 * 60 * 60)
+        changes = self.server.getRecentChanges(timestamp)
+        # Return just page names without timestamps
+        return [page for page, _ in changes]
+
     def put_page(self, pagename: str, content: str, token: Optional[str] = None, alias: str = None) -> bool:
         """Update page content using WikiRPC v2 putPage with authentication.
         

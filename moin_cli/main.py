@@ -107,5 +107,22 @@ def search(query, server):
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
 
+@main.command()
+@click.option('--days', '-d', type=int, default=7, help='Number of days to look back (default: 7)')
+@click.option('--server', '-s', help='Wiki server alias to use')
+def recent(days, server):
+    """Show pages changed in the last N days."""
+    try:
+        client = WikiRPCClient.from_config(server)
+        pages = client.get_recent_changes(days)
+        if not pages:
+            click.echo(f"No changes in the last {days} days")
+            return
+            
+        for page in pages:
+            click.echo(page)
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+
 if __name__ == "__main__":
     main()
