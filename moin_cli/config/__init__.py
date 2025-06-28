@@ -5,6 +5,13 @@ def get_config_path() -> Path:
     """Get the path to the configuration file"""
     return Path.home() / ".moin" / "config.toml"
 
+def save_config(config: dict) -> None:
+    """Save configuration to TOML file"""
+    config_path = get_config_path()
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(config_path, 'w') as f:
+        toml.dump(config, f)
+
 def load_config() -> dict:
     """Load configuration from TOML file"""
     config_path = get_config_path()

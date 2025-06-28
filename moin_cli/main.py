@@ -1,10 +1,32 @@
 import click
+from getpass import getpass
 from moin_cli.xmlrpc_client import WikiRPCClient
 
 @click.group()
 def main():
-    """A Python CLI for MoinMoin wiki servers via XML-RPC with MCP server support."""
+    """A Python CLI for MoinMoin wiki servers via XML-RPC with MCP server support.
+    
+    Supports authentication token management and page operations.
+    """
     pass
+
+@main.command()
+def auth():
+    """Get and store authentication token."""
+    try:
+        from moin_cli.config import load_config, save_config
+        
+        config = load_config()
+        client = WikiRPCClient.from_config()
+        password = getpass("Enter wiki password: ")
+        token = client.get_auth_token(config['username'], password)
+        
+        # Save token to config
+        config['token'] = token
+        save_config(config)
+        click.echo("Authentication token saved successfully")
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
 
 @main.command()
 @click.argument('pagename')

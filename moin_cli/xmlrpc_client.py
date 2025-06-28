@@ -2,6 +2,7 @@ import xmlrpc.client
 from typing import Optional
 import toml
 from pathlib import Path
+from moin_cli.config import get_config_path, load_config, save_config
 
 class WikiRPCClient:
     def __init__(self, endpoint: str):
@@ -20,6 +21,26 @@ class WikiRPCClient:
         """Get page content using WikiRPC v2 getPage."""
         return self.server.getPage(pagename)
 
-    def put_page(self, pagename: str, content: str) -> bool:
-        """Update page content using WikiRPC v2 putPage."""
-        return self.server.putPage(pagename, content)
+    def get_auth_token(self, username: str, password: str) -> str:
+        """Get authentication token from MoinMoin server."""
+        return self.server.getAuthToken(username, password)
+
+    def put_page(self, pagename: str, content: str, token: Optional[str] = None) -> bool:
+        """Update page content using WikiRPC v2 putPage with authentication.
+        
+        Args:
+            pagename: Name of page to update
+            content: New page content
+            token: Optional auth token. If None, will try to load from config.
+        """
+        if token is None:
+            config = load_config()
+            token = config.get('token')
+            if token is None:
+                raise ValueError("No auth token provided and none found in config")
+
+        # Use multicall to apply token and put page in one request
+        multicall = xmlrpc.client.MultiCall(self.server)
+        multicall.applyAuthToken(token)
+        multicall.putPage(pagename, content)
+        return tuple(multicall())[-1]  # Return just the putPage result
