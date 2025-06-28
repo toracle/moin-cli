@@ -12,19 +12,37 @@ def main():
 
 @main.command()
 def auth():
-    """Get and store authentication token."""
+    """Initial setup and authentication for MoinMoin wiki.
+    
+    Prompts for server URL, username and password to create initial configuration.
+    """
     try:
-        from moin_cli.config import load_config, save_config
-        
-        config = load_config()
-        client = WikiRPCClient.from_config()
+        from moin_cli.config import save_config
+        from pathlib import Path
+        import os
+
+        # Create config directory if it doesn't exist
+        config_dir = Path.home() / '.moin'
+        config_dir.mkdir(exist_ok=True)
+
+        # Prompt for configuration
+        url = click.prompt("Enter wiki server URL (e.g. http://localhost:8080)")
+        username = click.prompt("Enter wiki username")
         password = getpass("Enter wiki password: ")
-        token = client.get_auth_token(config['username'], password)
+
+        # Create client and get token
+        endpoint = f"{url}/?action=xmlrpc2"
+        client = WikiRPCClient(endpoint)
+        token = client.get_auth_token(username, password)
         
-        # Save token to config
-        config['token'] = token
+        # Save complete config
+        config = {
+            'url': url,
+            'username': username,
+            'token': token
+        }
         save_config(config)
-        click.echo("Authentication token saved successfully")
+        click.echo("Configuration saved successfully")
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
 
