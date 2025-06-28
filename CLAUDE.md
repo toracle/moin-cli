@@ -273,26 +273,11 @@ access_token = "abc123"
 
 ### Documentation Check Workflow
 
-#### Before Implementing Any Feature:
+#### Simple Workflow:
 
-1. **Search existing docs** - Check `docs/` directory for specifications
-   ```bash
-   find docs/ -name "*.md" -exec grep -l "config\|format" {} \;
-   rg -i "configuration|format" docs/
-   ```
-
-2. **Read relevant specifications** - Understand defined formats, APIs, workflows
-   - Configuration formats
-   - Command structures  
-   - API specifications
-   - User workflows
-
-3. **Identify gaps vs existing specs** - What's defined vs what needs implementation
-   - Follow existing patterns
-   - Extend documented formats
-   - Maintain consistency
-
-4. **Update docs if needed** - Document new features as you implement them
+1. **Quick search first**: `rg -i "your-feature" docs/`
+2. **Read what you find** - Follow existing specs if they exist  
+3. **Implement to match** - Don't reinvent documented formats
 
 #### Documentation Sources to Check:
 
@@ -302,19 +287,15 @@ access_token = "abc123"
 - **API specs** - Interface definitions and formats
 - **README files** - Setup and usage instructions
 
-### Implementation Guidelines
+### Simple Implementation Pattern
 
 ```bash
-# ✅ GOOD: Check docs first
-# 1. Search for existing format specs
-rg -i "configuration" docs/
-# 2. Read user-guide/configuration.md  
-# 3. Implement matching documented format
+# ✅ GOOD: 30 seconds prevents hours of rework
+rg -i "configuration" docs/  # Found user-guide/configuration.md!
+# Read it, implement to match
 
-# ❌ BAD: Implement first, check docs later
-# 1. Create new format
-# 2. Discover it conflicts with docs
-# 3. Rework entire implementation
+# ❌ BAD: Excitement-driven development  
+# Start coding immediately, discover conflicts later
 ```
 
 ### Benefits of Documentation-First
