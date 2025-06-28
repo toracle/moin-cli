@@ -102,9 +102,26 @@ black .
 isort .
 ```
 
+## Technical Documentation
+
+### Design Documents
+- **[CLI Design](docs/CLI_DESIGN.md)** - Complete command-line interface specification
+- **[Configuration System](docs/CONFIGURATION.md)** - Server configuration and settings management
+- **[Authentication Design](docs/AUTHENTICATION.md)** - Azure CLI-like token-based authentication system
+- **[WikiRPC v2 Specification](docs/WIKIRPC_V2.md)** - Complete WikiRPC v2 protocol documentation
+- **[Authentication Analysis](docs/AUTHENTICATION_ANALYSIS.md)** - Security analysis and implementation details
+- **[Implementation Plan](docs/IMPLEMENTATION_PLAN.md)** - 5-week development roadmap and architecture
+
+### Key Features Overview
+- **Token-based Authentication**: Azure CLI-like secure authentication flow
+- **Multi-server Support**: Manage multiple MoinMoin wiki servers with profiles
+- **MCP Integration**: Built-in MCP server for Claude Code integration
+- **RESTful Commands**: Clean `get/put/list/search` operations
+- **Configuration Management**: Secure token storage in `~/.moin/` directory
+
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](LICENSE) file for details
 
 ## Contributing
 
