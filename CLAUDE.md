@@ -109,6 +109,84 @@ This approach keeps the repository clean while leveraging GitHub's excellent pro
 - Include tests for new functionality
 - Update documentation with code changes
 - **Use `uv run` for all Python commands** to ensure project-specific environment
+- **Follow spiral development** - implement minimal core first, then expand
+
+## Spiral Development Principle
+
+**Core Philosophy**: Start with the essential minimum that creates a working end-to-end system, then incrementally add features through successive iterations.
+
+### Why Spiral Development?
+1. **Early Validation** - Get working system quickly to validate approach
+2. **Risk Reduction** - Discover integration issues early with simple implementation
+3. **User Feedback** - Working system enables early user testing and feedback
+4. **Confidence Building** - Each iteration builds on proven foundation
+5. **Scope Management** - Prevents over-engineering and feature creep
+
+### Implementation Strategy
+
+#### Phase 1: Minimal Viable Core
+Implement the absolute minimum needed for basic functionality:
+- **Goal**: Get primary use case working end-to-end
+- **Focus**: Essential path only, hardcoded values acceptable
+- **Quality**: Basic error handling, no edge cases
+- **Documentation**: Simple usage examples
+
+#### Phase 2: Essential Features  
+Add the most critical missing pieces:
+- **Goal**: Handle common use cases reliably
+- **Focus**: Configuration, error handling, user experience
+- **Quality**: Robust error messages, validation
+- **Documentation**: Complete user guides
+
+#### Phase 3: Enhanced Features
+Polish and add advanced capabilities:
+- **Goal**: Production-ready with advanced features
+- **Focus**: Security, performance, edge cases
+- **Quality**: Comprehensive testing, security features
+- **Documentation**: Advanced usage, API docs
+
+### Example: Configuration System
+
+Instead of implementing full configuration system with encryption, keyring, XDG directories, etc.:
+
+**❌ Big Bang Approach:**
+```
+Implement: ServerConfig + Settings + Config + Manager + Encryption + Keyring + XDG + TOML + Validation + Error handling
+Result: Complex, slow, many integration points, hard to debug
+```
+
+**✅ Spiral Approach:**
+
+**Iteration 1**: Hardcoded connection
+```python
+# Just get CLI connecting to wiki server
+wiki_url = "http://localhost:8080"
+username = "admin" 
+# Focus: Does basic connection work?
+```
+
+**Iteration 2**: Simple config file
+```python
+# Add basic TOML config file support
+config = {"url": "...", "username": "..."}
+# Focus: Does file-based config work?
+```
+
+**Iteration 3**: Multiple servers + security
+```python
+# Add server management and secure storage
+# Focus: Does multi-server management work?
+```
+
+### Benefits Applied to Current Task
+
+For our configuration system, minimal core would be:
+1. **Basic connection** - hardcoded URL, get one command working
+2. **Simple config** - plain TOML file, no encryption
+3. **Server management** - add/list servers
+4. **Security layer** - encryption, keyring integration
+
+This gets us a working CLI much faster, with each iteration adding real value.
 
 ## Python Environment Management with UV
 
