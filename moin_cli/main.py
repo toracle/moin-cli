@@ -53,12 +53,15 @@ def auth():
 
 @main.command()
 @click.argument('pagename')
-@click.option('--wiki', '-w', help='Wiki alias to use')
-def get(pagename, wiki):
+@click.option('--server', '-s', help='Wiki server alias to use')
+@click.option('--quiet', '-q', is_flag=True, help='Suppress status messages')
+def get(pagename, server, quiet):
     """Get a page's content."""
     try:
-        client = WikiRPCClient.from_config(wiki)
+        client = WikiRPCClient.from_config(server)
         content = client.get_page(pagename)
+        if not quiet:
+            click.echo(f"Retrieved content for {pagename}")
         click.echo(content)
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
@@ -66,12 +69,12 @@ def get(pagename, wiki):
 @main.command()
 @click.argument('pagename')
 @click.argument('content')
-@click.option('--wiki', '-w', help='Wiki alias to use')
-def put(pagename, content, wiki):
+@click.option('--server', '-s', help='Wiki server alias to use')
+def put(pagename, content, server):
     """Update a page's content."""
     try:
-        client = WikiRPCClient.from_config(wiki)
-        success = client.put_page(pagename, content, alias=wiki)
+        client = WikiRPCClient.from_config(server)
+        success = client.put_page(pagename, content, alias=server)
         if success:
             click.echo(f"Successfully updated {pagename}")
         else:

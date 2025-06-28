@@ -14,7 +14,7 @@ class WikiRPCClient:
         """Create client from config file."""
         from moin_cli.config import get_wiki_config
         wiki_config = get_wiki_config(alias)
-        endpoint = f"{wiki_config['url']}/?action=xmlrpc2"
+        endpoint = f"{wiki_config.url}/?action=xmlrpc2"
         return cls(endpoint)
 
     def get_page(self, pagename: str) -> str:
@@ -37,7 +37,7 @@ class WikiRPCClient:
         if token is None:
             from moin_cli.config import get_wiki_config
             wiki_config = get_wiki_config(alias)
-            token = wiki_config.get('access_token')
+            token = wiki_config.access_token
             if token is None:
                 raise ValueError("No auth token provided and none found in config")
 
