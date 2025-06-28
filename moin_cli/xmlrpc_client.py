@@ -25,6 +25,10 @@ class WikiRPCClient:
         """Get authentication token from MoinMoin server."""
         return self.server.getAuthToken(username, password)
 
+    def get_all_pages(self) -> list[str]:
+        """Get list of all page names from the wiki using WikiRPC v2 getAllPages."""
+        return self.server.getAllPages()
+
     def put_page(self, pagename: str, content: str, token: Optional[str] = None, alias: str = None) -> bool:
         """Update page content using WikiRPC v2 putPage with authentication.
         
