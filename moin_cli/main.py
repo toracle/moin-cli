@@ -82,5 +82,18 @@ def put(pagename, content, server):
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
 
+@main.command()
+@click.option('--server', '-s', help='Wiki server alias to use')
+def list(server):
+    """List all pages on the wiki."""
+    try:
+        client = WikiRPCClient.from_config(server)
+        pages = client.get_all_pages()
+        click.echo("Pages on wiki:")
+        for page in pages:
+            click.echo(f"- {page}")
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+
 if __name__ == "__main__":
     main()
