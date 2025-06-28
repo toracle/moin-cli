@@ -93,42 +93,67 @@ This approach keeps the repository clean while leveraging GitHub's excellent pro
 
 ### GitHub Cross-Referencing & Progress Tracking
 
-**Core Principle**: Maintain bidirectional linking between commits, issues, and implementation context for session continuity.
+**Core Principle**: Separate problem space (issues) from solution space (PRs) while maintaining bidirectional linking for session continuity.
 
-#### Cross-Referencing Strategy
+#### Problem Space vs Solution Space Separation
 
-**1. Issue Description (Body) - Static Requirements & Progress State**
+**GitHub Issues - Problem Space (WHAT & WHY)**
+- 🎯 **Requirements & acceptance criteria** - What needs to be built
+- 🎯 **Business objectives** - Why this matters to users
+- 🎯 **Scope definition** - Boundaries and constraints
+- 🎯 **High-level progress** - Checkbox completion state
+- 🎯 **Requirement changes** - Scope evolution and clarifications
+
+**Pull Requests - Solution Space (HOW)**
+- 🔧 **Technical implementation** - How it's being built
+- 🔧 **Architecture decisions** - Technology choices and rationale
+- 🔧 **Detailed progress** - Session logs and implementation steps
+- 🔧 **Code review** - Quality and approach discussions
+- 🔧 **Technical blockers** - Implementation challenges
+
+#### Hybrid Workflow (Pragmatic Approach)
+
+**Before PR Exists:**
+- Use issue comments for early development progress
+- Document initial technical approach and blockers
+- Track session work until first substantial commit
+
+**After PR Created:**
+- Move detailed implementation discussion to PR
+- Keep issue focused on requirements and high-level progress  
+- Cross-reference between issue and PR for context
+
+**Cross-Referencing Strategy:**
+
+**1. Issue Description (Body) - Problem Definition**
 
 **What belongs in issue body:**
 - ✅ **Acceptance criteria** with checkboxes `[ ]` / `[x]`
-- ✅ **Task overview** and objectives (never changes)
-- ✅ **Dependencies list** and references (stable info)
-- ✅ **Current completion state** via checkbox updates
-- ✅ **Implementation requirements** and specifications
-- ✅ **Definition of done** criteria
+- ✅ **Task overview** and business objectives
+- ✅ **Dependencies** and references
+- ✅ **High-level completion state** via checkbox updates
+- ✅ **Requirements** and scope definition
 
-**How to update:**
-- Use `gh issue edit N --body "..."` to update entire description
-- Mark completed items with `[x]`, pending with `[ ]`
-- Keep original structure, only update progress checkmarks
-- Issue body = "what needs to be done + what's completed"
+**2. Issue Comments - Early Development & Problem Space Evolution**
 
-**2. Issue Comments - Temporal Development Log**
+**What belongs in comments (before PR):**
+- 🔄 **Early progress** and initial technical exploration
+- 🔄 **Requirements clarification** and scope changes
+- 🔄 **Major blockers** that affect requirements
 
-**What belongs in comments:**
-- 🔄 **Implementation progress updates** ("just completed X, starting Y")
-- 🔄 **Technical decisions** and approach rationale
-- 🔄 **Code snippets** and commit references
-- 🔄 **Blockers encountered** and resolution approaches
-- 🔄 **Session summaries** and next steps
-- 🔄 **Questions** and discussion points
+**What belongs in comments (after PR):**
+- 🔄 **Requirement updates** from implementation learnings
+- 🔄 **Scope changes** discovered during development
 
-**How to add:**
-- Use `gh issue comment N --body "..."` to append new information
-- Include commit hashes, file locations, specific changes
-- Comments = "what happened + how + why + what's next"
+**3. Pull Request Description & Comments - Solution Implementation**
 
-**3. Commit Message Linking** - Bidirectional references
+**What belongs in PR:**
+- 🔧 **Implementation approach** and technical decisions
+- 🔧 **Detailed progress updates** and session logs
+- 🔧 **Code-specific discussions** and technical blockers
+- 🔧 **Architecture choices** and rationale
+
+**4. Commit Message Linking** - Bidirectional references
 - Reference issue numbers in commit messages: `Add config models (#1)`
 - GitHub automatically creates links: commit → issue → commit
 - Use conventional format: `<type>: <description> (#issue)`
@@ -136,39 +161,53 @@ This approach keeps the repository clean while leveraging GitHub's excellent pro
 
 #### Content Separation Examples
 
-**✅ GOOD: Issue Body Content**
+**✅ GOOD: Issue Body (Problem Space)**
 ```markdown
-## Acceptance Criteria
-- [x] Create ServerConfig Pydantic model
-- [ ] Implement token encryption  
-- [ ] Add server management operations
+## Overview
+Users need secure configuration management for multiple wiki servers.
 
-## Dependencies
-- pydantic>=2.0.0
-- keyring>=24.0.0
+## Acceptance Criteria  
+- [ ] Support multiple server configurations
+- [ ] Secure credential storage
+- [ ] TOML configuration format
+
+## Success Metrics
+- Users can authenticate to multiple wikis seamlessly
+- Credentials stored securely (encrypted)
 ```
 
-**✅ GOOD: Issue Comment Content**
+**✅ GOOD: Issue Comment (Early Development)**
 ```markdown
-## Progress Update (Commit: abc123f)
+## Initial Technical Investigation
 
-Just completed ServerConfig model in `models.py`. 
+Started exploring Pydantic vs dataclasses for config models.
+Pydantic provides better validation for URL/timeout fields.
 
-**Technical Decision**: Used Pydantic v2 validator syntax for URL validation.
-**Next**: Starting token encryption with keyring integration.
-**Blocker**: Need to research keyring backend selection for cross-platform support.
+**Next**: Create basic models and test TOML serialization.
 ```
 
-**❌ BAD: Don't put in issue body**
-- "Just finished working on..." (temporal)
-- Specific commit hashes (temporal) 
-- Debug output or error messages (temporal)
-- "Next I will..." statements (temporal)
+**✅ GOOD: PR Description (Solution Space)**
+```markdown
+## Implementation Approach
 
-**❌ BAD: Don't put in comments**
-- Acceptance criteria lists (belongs in body)
-- Complete task specifications (belongs in body)
-- Dependency lists (belongs in body)
+- **Models**: Using Pydantic for validation and serialization
+- **Storage**: Keyring integration for token encryption  
+- **Architecture**: Separate models.py, manager.py, defaults.py
+
+## Technical Decisions
+- Pydantic v2 for modern validation syntax
+- XDG directories for cross-platform config location
+
+## Progress
+- [x] ServerConfig model with validation
+- [x] Basic TOML serialization  
+- [ ] Keyring integration pending
+```
+
+**❌ BAD: Don't mix spaces**
+- Technical implementation details in issue body
+- Business requirements in PR descriptions
+- Detailed session logs in issue comments
 
 #### Session Continuity Commands
 
