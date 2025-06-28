@@ -47,8 +47,8 @@ moin get HomePage
 
 ### Edit a page
 ```bash
-# Opens your default editor
-moin put MyPage
+# Write content directly
+moin put MyPage "This is the new page content"
 
 # Or write from file
 moin put MyPage --file content.txt

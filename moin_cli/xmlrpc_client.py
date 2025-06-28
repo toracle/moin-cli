@@ -14,7 +14,7 @@ class WikiRPCClient:
         """Create client from config file."""
         from moin_cli.config import get_wiki_config
         wiki_config = get_wiki_config(alias)
-        endpoint = f"{wiki_config['url']}/?action=xmlrpc2"
+        endpoint = f"{wiki_config.url}/?action=xmlrpc2"
         return cls(endpoint)
 
     def get_page(self, pagename: str) -> str:
@@ -24,6 +24,46 @@ class WikiRPCClient:
     def get_auth_token(self, username: str, password: str) -> str:
         """Get authentication token from MoinMoin server."""
         return self.server.getAuthToken(username, password)
+
+    def get_all_pages(self) -> list[str]:
+        """Get list of all page names from the wiki using WikiRPC v2 getAllPages."""
+        return self.server.getAllPages()
+
+    def search_pages(self, query: str) -> list[str]:
+        """Search for pages containing the query string using WikiRPC v2 searchPages.
+        
+        Args:
+            query: Search string to look for in page contents
+            
+        Returns:
+            List of page names that match the search
+        """
+        return self.server.searchPages(query)
+
+    def get_recent_changes(self, days: int = 7) -> list[str]:
+        """Get list of recently changed pages using WikiRPC v2 getRecentChanges.
+        
+        Args:
+            days: Number of days to look back for changes (default: 7)
+            
+        Returns:
+            List of page names that were recently changed
+        """
+        from datetime import datetime, timedelta
+        since = datetime.utcnow() - timedelta(days=days)
+        changes = self.server.getRecentChanges(since)
+        
+        # Handle different response formats:
+        if not changes:
+            return []
+        # If first item is a dictionary with 'name' field
+        if isinstance(changes[0], dict) and 'name' in changes[0]:
+            return [change['name'] for change in changes]
+        # If first item is a tuple (pagename, timestamp)
+        if isinstance(changes[0], (tuple, list)) and len(changes[0]) == 2:
+            return [page for page, _ in changes]
+        # If just page names are returned
+        return list(changes)
 
     def put_page(self, pagename: str, content: str, token: Optional[str] = None, alias: str = None) -> bool:
         """Update page content using WikiRPC v2 putPage with authentication.
@@ -37,7 +77,7 @@ class WikiRPCClient:
         if token is None:
             from moin_cli.config import get_wiki_config
             wiki_config = get_wiki_config(alias)
-            token = wiki_config.get('access_token')
+            token = wiki_config.access_token
             if token is None:
                 raise ValueError("No auth token provided and none found in config")
 

@@ -24,7 +24,7 @@ class ConfigManager:
         config_path = self.get_config_path()
         config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(config_path, 'w') as f:
-            toml.dump(config.model_dump(), f)
+            toml.dump(config.model_dump(mode='json'), f)
 
     def load_config(self) -> Config:
         """Load and validate configuration from TOML file"""
