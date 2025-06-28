@@ -9,7 +9,7 @@ A Python command-line interface for interacting with MoinMoin wiki servers via X
 - Perform wiki operations from the command line
 - Read, write, and manage wiki pages
 - Search and navigate wiki content
-- Batch operations for content management
+- Multi-server support with secure token authentication
 
 ### MCP Server
 - Serve as an MCP server for Claude Code integration
@@ -17,107 +17,82 @@ A Python command-line interface for interacting with MoinMoin wiki servers via X
 - Enable AI-assisted wiki content management
 - Support for structured wiki operations
 
-## Installation
+## Quick Start
 
 ```bash
-# Clone the repository
+# Install
 git clone <repository-url>
 cd moin-cli
-
-# Install dependencies
 pip install -e .
+
+# Setup your first server
+moin server add work --url https://wiki.company.com
+moin server set-default work
+
+# Start using
+moin get HomePage
+moin put Documentation
+moin search "installation"
 ```
 
-## Usage
+## Usage Examples
 
-### CLI Mode
-
+### Basic Operations
 ```bash
-# Connect to a MoinMoin server
-moin-cli --server https://wiki.example.com --user username
-
 # Read a page
-moin-cli read "PageName"
+moin get PageName
 
-# Write to a page
-moin-cli write "PageName" --content "New content"
+# Edit a page (opens editor)
+moin put PageName
+
+# Write from file
+moin put PageName --file content.txt
 
 # Search pages
-moin-cli search "search term"
+moin search "search term"
 
 # List all pages
-moin-cli list
+moin list
 ```
 
-### MCP Server Mode
-
+### Multi-Server Management
 ```bash
-# Start as MCP server
-moin-cli serve --mcp
+# Add multiple servers
+moin server add work --url https://work.wiki.com
+moin server add personal --url https://personal.wiki.com
 
-# Configure in Claude Code settings
-# Add server configuration pointing to this instance
+# Use specific server
+moin get HomePage --server personal
+
+# List configured servers
+moin server list
+```
+
+### MCP Server for Claude Code
+```bash
+# Start MCP server
+moin serve
+
+# Or with specific settings
+moin serve --host localhost --port 8000 --server work
 ```
 
 ## Configuration
 
-Configuration can be provided via:
-- Command line arguments
-- Environment variables
-- Configuration file (`~/.moin-cli.conf`)
+- **Configuration file**: `~/.moin/config.toml`
+- **Token-based authentication**: Secure, Azure CLI-like authentication flow
+- **Multi-server support**: Manage multiple MoinMoin wiki servers
+- **Environment variables**: Support for automation and CI/CD
 
-### Environment Variables
+## Documentation
 
-- `MOIN_SERVER_URL`: Default MoinMoin server URL
-- `MOIN_USERNAME`: Default username for authentication
-- `MOIN_PASSWORD`: Default password for authentication
+📖 **[Complete Documentation](docs/README.md)**
 
-## MCP Integration
-
-When running as an MCP server, moin-cli provides these tools to Claude Code:
-
-- `read_page`: Read content from a wiki page
-- `write_page`: Write content to a wiki page
-- `search_pages`: Search for pages matching criteria
-- `list_pages`: List all available pages
-- `get_page_info`: Get metadata about a page
-
-## Requirements
-
-- Python 3.11+
-- MoinMoin server with XML-RPC enabled
-- Network access to the target MoinMoin server
-
-## Development
-
-```bash
-# Install in development mode
-pip install -e .[dev]
-
-# Run tests
-pytest
-
-# Format code
-black .
-isort .
-```
-
-## Technical Documentation
-
-### Design Documents
-- **[CLI Design](docs/CLI_DESIGN.md)** - Complete command-line interface specification
-- **[Configuration System](docs/CONFIGURATION.md)** - Server configuration and settings management
-- **[Authentication Design](docs/AUTHENTICATION.md)** - Azure CLI-like token-based authentication system
-- **[WikiRPC v2 Specification](docs/WIKIRPC_V2.md)** - Complete WikiRPC v2 protocol documentation
-- **[Authentication Analysis](docs/AUTHENTICATION_ANALYSIS.md)** - Security analysis and implementation details
-- **[Implementation Plan](docs/IMPLEMENTATION_PLAN.md)** - 5-week development roadmap and architecture
-
-### Key Features Overview
-- **Token-based Authentication**: Azure CLI-like secure authentication flow
-- **Multi-server Support**: Manage multiple MoinMoin wiki servers with profiles
-- **MCP Integration**: Built-in MCP server for Claude Code integration
-- **RESTful Commands**: Clean `get/put/list/search` operations
-- **Configuration Management**: Secure token storage in `~/.moin/` directory
+### Quick Links
+- **[Getting Started](docs/user-guide/getting-started.md)** - Installation and setup
+- **[Commands](docs/user-guide/commands.md)** - Complete command reference  
+- **[Configuration](docs/user-guide/configuration.md)** - Settings and server management
+- **[Architecture](docs/developer/architecture.md)** - Technical design and security
 
 ## License
 

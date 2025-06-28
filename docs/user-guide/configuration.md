@@ -19,29 +19,31 @@ cache_enabled = true
 
 [server.work]
 name = "work"
-url = "https://work.company.com/"
-engine = "moinmoin"
+url = "https://wiki.company.com/"
 username = "john.doe"
 access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
 token_expires = "2024-12-31T23:59:59Z"
 created_at = "2024-06-28T10:00:00Z"
 last_used = "2024-06-28T14:30:00Z"
+verify_ssl = true
+timeout = 30
 
 [server.personal]
 name = "personal"
 url = "https://mywiki.example.com/"
-engine = "moinmoin"
 username = "john"
 access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
 token_expires = "2024-07-28T12:00:00Z"
+verify_ssl = true
+timeout = 30
 
 [server.local]
 name = "local"
 url = "http://localhost:8080/"
-engine = "moinmoin"
 username = "admin"
 access_token = "simple-token-123"
 verify_ssl = false
+timeout = 15
 
 [mcp]
 host = "localhost"
@@ -70,16 +72,14 @@ default_server = "work"
 
 ### Required Fields
 - `name`: Server identifier
-- `url`: MoinMoin wiki URL with XML-RPC endpoint
+- `url`: MoinMoin wiki URL (XML-RPC endpoint will be appended automatically)
 - `username`: Username for authentication
 - `access_token`: Authentication token (obtained via login)
 
 ### Optional Fields
-- `engine`: Wiki engine
 - `token_expires`: Token expiration timestamp (ISO format)
 - `timeout`: Request timeout in seconds (default: 30)
 - `verify_ssl`: SSL certificate verification (default: true)
-- `user_agent`: Custom user agent string
 - `created_at`: When server was added
 - `last_used`: Last operation timestamp
 
@@ -129,16 +129,16 @@ access_token = "simple-token"
 ## Default Behavior
 
 ### When No Configuration Exists
-1. Prompt user to run `moin config add-wiki`
+1. Prompt user to run `moin server add`
 2. Offer to create configuration interactively
 3. Suggest example configuration
 
-### Default Wiki Selection
-1. Command-line `--wiki` option
-2. `MOIN_DEFAULT_WIKI` environment variable
-3. `default_wiki` from configuration file
-4. First wiki in alphabetical order
-5. Error if no wikis configured
+### Default Server Selection
+1. Command-line `--server` option
+2. `MOIN_DEFAULT_SERVER` environment variable
+3. `default_server` from configuration file
+4. First server in alphabetical order
+5. Error if no servers configured
 
 ## Configuration Commands
 
@@ -147,25 +147,25 @@ access_token = "simple-token"
 # First-time setup wizard
 moin config init
 
-# Add new wiki interactively
-moin config add-wiki
+# Add new server interactively
+moin server add
 
-# Add wiki with prompts
-moin config add-wiki mysite
+# Add server with prompts
+moin server add mysite
 ```
 
 ### Direct Configuration
 ```bash
-# Add wiki with all details
-moin config add-wiki work \
+# Add server with all details
+moin server add work \
   --url https://wiki.company.com \
   --username john.doe
 
-# Set default wiki
-moin config set-default work
+# Set default server
+moin server set-default work
 
-# Remove wiki configuration
-moin config remove-wiki old-site
+# Remove server configuration
+moin server remove old-site
 ```
 
 ### Information Commands
@@ -173,14 +173,14 @@ moin config remove-wiki old-site
 # Show current configuration
 moin config show
 
-# List configured wikis
-moin config list-wikis
+# List configured servers
+moin server list
 
-# Show effective configuration for a wiki
-moin config show --wiki work
+# Show effective configuration for a server
+moin config show --server work
 
-# Test wiki connection
-moin config test --wiki work
+# Test server connection
+moin server test work
 ```
 
 ## Security Considerations
@@ -224,30 +224,30 @@ moin config merge other-config.toml
 ### Minimal Configuration
 ```toml
 [settings]
-default_wiki = "main"
+default_server = "main"
 
-[wikis.main]
+[server.main]
 url = "https://wiki.example.com/"
 username = "myuser"
 ```
 
-### Advanced Multi-Wiki Setup
+### Advanced Multi-Server Setup
 ```toml
 [settings]
-default_wiki = "work"
+default_server = "work"
 format = "markdown"
 editor = "code --wait"
 
-[wikis.work]
+[server.work]
 url = "https://internal.company.com/wiki/"
 username = "john.doe"
 timeout = 45
 
-[wikis.opensource]
+[server.opensource]
 url = "https://opensource-project.org/wiki/"
 username = "contributor"
 
-[wikis.personal]
+[server.personal]
 url = "http://homelab:8080/"
 username = "admin"
 verify_ssl = false
@@ -255,15 +255,15 @@ verify_ssl = false
 [mcp]
 host = "0.0.0.0"
 port = 8080
-default_wiki = "work"
+default_server = "work"
 ```
 
 ## Troubleshooting
 
 ### Common Issues
-1. **No default wiki**: Set `default_wiki` or use `--wiki` option
+1. **No default server**: Set `default_server` or use `--server` option
 2. **Authentication failure**: Check username/password environment variables
-3. **Connection timeout**: Increase `timeout` value in wiki configuration
+3. **Connection timeout**: Increase `timeout` value in server configuration
 4. **SSL errors**: Verify `verify_ssl` setting and certificate validity
 
 ### Debug Mode
@@ -271,8 +271,8 @@ default_wiki = "work"
 # Show effective configuration
 moin config show --debug
 
-# Test wiki connectivity
-moin config test --wiki work --verbose
+# Test server connectivity
+moin server test work --verbose
 
 # Show configuration file locations
 moin config locate
