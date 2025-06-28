@@ -110,6 +110,7 @@ This approach keeps the repository clean while leveraging GitHub's excellent pro
 - Update documentation with code changes
 - **Use `uv run` for all Python commands** to ensure project-specific environment
 - **Follow spiral development** - implement minimal core first, then expand
+- **Check existing documentation BEFORE implementing** - avoid reinventing specs
 
 ## Spiral Development Principle
 
@@ -243,6 +244,96 @@ uv sync --group dev
 - **IDE**: Configure IDE to use `uv run` for Python interpreter
 
 This ensures all development happens in a consistent, isolated environment with the correct dependencies.
+
+## Documentation-First Development
+
+**Critical Principle**: Always check existing documentation before implementing new features or formats.
+
+### The Problem: Reinventing Specifications
+
+**What happened**: During config system implementation, I created my own TOML format instead of checking the existing user guide specification:
+
+```toml
+# ❌ My invented format (WRONG)
+[wikis.local]
+url = "http://localhost:8080"
+token = "abc123"
+
+# ✅ Documented format (docs/user-guide/configuration.md)
+[settings]
+default_server = "local"
+
+[server.local]
+name = "local" 
+url = "http://localhost:8080"
+access_token = "abc123"
+```
+
+**Impact**: Implementation didn't match documented specification, requiring complete rework.
+
+### Documentation Check Workflow
+
+#### Before Implementing Any Feature:
+
+1. **Search existing docs** - Check `docs/` directory for specifications
+   ```bash
+   find docs/ -name "*.md" -exec grep -l "config\|format" {} \;
+   rg -i "configuration|format" docs/
+   ```
+
+2. **Read relevant specifications** - Understand defined formats, APIs, workflows
+   - Configuration formats
+   - Command structures  
+   - API specifications
+   - User workflows
+
+3. **Identify gaps vs existing specs** - What's defined vs what needs implementation
+   - Follow existing patterns
+   - Extend documented formats
+   - Maintain consistency
+
+4. **Update docs if needed** - Document new features as you implement them
+
+#### Documentation Sources to Check:
+
+- **User guides** (`docs/user-guide/`) - User-facing specifications
+- **Developer docs** (`docs/developer/`) - Technical implementation details  
+- **Architecture docs** - System design and patterns
+- **API specs** - Interface definitions and formats
+- **README files** - Setup and usage instructions
+
+### Implementation Guidelines
+
+```bash
+# ✅ GOOD: Check docs first
+# 1. Search for existing format specs
+rg -i "configuration" docs/
+# 2. Read user-guide/configuration.md  
+# 3. Implement matching documented format
+
+# ❌ BAD: Implement first, check docs later
+# 1. Create new format
+# 2. Discover it conflicts with docs
+# 3. Rework entire implementation
+```
+
+### Benefits of Documentation-First
+
+1. **Consistency** - Implementation matches user expectations
+2. **Efficiency** - Avoid rework from specification conflicts
+3. **Quality** - Follow established patterns and best practices
+4. **Collaboration** - Other developers understand documented formats
+5. **User Experience** - Behavior matches documentation
+
+### When Documentation Doesn't Exist
+
+If no documentation exists for what you're implementing:
+1. **Create the specification first** - Document the format/API before coding
+2. **Review with team** - Get feedback on the specification
+3. **Implement to spec** - Build exactly what was documented
+4. **Update docs** - Keep documentation current with implementation
+
+This ensures documentation and implementation stay in sync from the start.
 
 ## Branch-Issue Linking for Session Continuity
 
