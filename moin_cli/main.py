@@ -89,9 +89,8 @@ def list(server):
     try:
         client = WikiRPCClient.from_config(server)
         pages = client.get_all_pages()
-        click.echo("Pages on wiki:")
         for page in pages:
-            click.echo(f"- {page}")
+            click.echo(page)
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
 

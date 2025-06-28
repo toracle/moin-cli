@@ -30,10 +30,9 @@ def test_list_command_basic():
         result = runner.invoke(main, ['list', '--server', 'test'])
         
         assert result.exit_code == 0
-        assert "Pages on wiki:" in result.output
-        assert "- FrontPage" in result.output
-        assert "- HomePage" in result.output
-        assert "- SandBox" in result.output
+        assert "FrontPage" in result.output
+        assert "HomePage" in result.output
+        assert "SandBox" in result.output
 
 
 def test_list_command_empty_wiki():
@@ -57,8 +56,7 @@ def test_list_command_empty_wiki():
         result = runner.invoke(main, ['list', '--server', 'test'])
         
         assert result.exit_code == 0
-        assert "Pages on wiki:" in result.output
-        # Should show header but no page items
+        # Should show no output for empty wiki (just empty or whitespace)
 
 
 def test_list_command_error_handling():
