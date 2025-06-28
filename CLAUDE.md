@@ -91,6 +91,134 @@ Issue #42: "Add multi-server authentication support"
 
 This approach keeps the repository clean while leveraging GitHub's excellent project management and collaboration features.
 
+### GitHub Cross-Referencing & Progress Tracking
+
+**Core Principle**: Maintain bidirectional linking between commits, issues, and implementation context for session continuity.
+
+#### Cross-Referencing Strategy
+
+**1. Issue Description (Body) - Static Requirements & Progress State**
+
+**What belongs in issue body:**
+- ✅ **Acceptance criteria** with checkboxes `[ ]` / `[x]`
+- ✅ **Task overview** and objectives (never changes)
+- ✅ **Dependencies list** and references (stable info)
+- ✅ **Current completion state** via checkbox updates
+- ✅ **Implementation requirements** and specifications
+- ✅ **Definition of done** criteria
+
+**How to update:**
+- Use `gh issue edit N --body "..."` to update entire description
+- Mark completed items with `[x]`, pending with `[ ]`
+- Keep original structure, only update progress checkmarks
+- Issue body = "what needs to be done + what's completed"
+
+**2. Issue Comments - Temporal Development Log**
+
+**What belongs in comments:**
+- 🔄 **Implementation progress updates** ("just completed X, starting Y")
+- 🔄 **Technical decisions** and approach rationale
+- 🔄 **Code snippets** and commit references
+- 🔄 **Blockers encountered** and resolution approaches
+- 🔄 **Session summaries** and next steps
+- 🔄 **Questions** and discussion points
+
+**How to add:**
+- Use `gh issue comment N --body "..."` to append new information
+- Include commit hashes, file locations, specific changes
+- Comments = "what happened + how + why + what's next"
+
+**3. Commit Message Linking** - Bidirectional references
+- Reference issue numbers in commit messages: `Add config models (#1)`
+- GitHub automatically creates links: commit → issue → commit
+- Use conventional format: `<type>: <description> (#issue)`
+- Include issue context in commit descriptions
+
+#### Content Separation Examples
+
+**✅ GOOD: Issue Body Content**
+```markdown
+## Acceptance Criteria
+- [x] Create ServerConfig Pydantic model
+- [ ] Implement token encryption  
+- [ ] Add server management operations
+
+## Dependencies
+- pydantic>=2.0.0
+- keyring>=24.0.0
+```
+
+**✅ GOOD: Issue Comment Content**
+```markdown
+## Progress Update (Commit: abc123f)
+
+Just completed ServerConfig model in `models.py`. 
+
+**Technical Decision**: Used Pydantic v2 validator syntax for URL validation.
+**Next**: Starting token encryption with keyring integration.
+**Blocker**: Need to research keyring backend selection for cross-platform support.
+```
+
+**❌ BAD: Don't put in issue body**
+- "Just finished working on..." (temporal)
+- Specific commit hashes (temporal) 
+- Debug output or error messages (temporal)
+- "Next I will..." statements (temporal)
+
+**❌ BAD: Don't put in comments**
+- Acceptance criteria lists (belongs in body)
+- Complete task specifications (belongs in body)
+- Dependency lists (belongs in body)
+
+#### Session Continuity Commands
+
+Future sessions can discover context using:
+
+```bash
+# Current work context
+git branch --show-current      # Shows branch with issue number
+git log --oneline -3          # Shows recent commits with issue refs
+gh issue list --state open    # Shows active issues
+gh issue view N              # Shows current progress and context
+
+# Find work for specific issue
+git branch -a | grep "issue-N"
+gh issue view N --comments   # Full development history
+```
+
+#### Progress Tracking Workflow
+
+1. **Start Session**:
+   ```bash
+   # Discover current context
+   git branch --show-current && gh issue view $(git branch --show-current | grep -o 'issue-[0-9]*' | cut -d'-' -f2)
+   ```
+
+2. **During Development**:
+   - Update issue description with progress checkmarks
+   - Make commits with issue references
+   - Add implementation comments to issue
+
+3. **End Session**:
+   ```bash
+   # Commit with issue reference
+   git commit -m "Implement config models (#1)
+   
+   - Add ServerConfig, Settings, Config Pydantic models
+   - Include validation and default values
+   - Matches user guide specification format
+   
+   Progress: 60% complete - models done, manager pending"
+   ```
+
+#### Benefits
+
+- **Session Handoff** - Any session can discover current context quickly
+- **Bidirectional Links** - GitHub creates automatic cross-references
+- **Development History** - Issues contain complete implementation timeline
+- **Progress Visibility** - Issue descriptions show current completion state
+- **Context Preservation** - Commits link back to requirements and decisions
+
 ## Other Project-Specific Guidelines
 
 ### Code Organization
