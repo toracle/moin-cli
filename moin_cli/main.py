@@ -1,4 +1,5 @@
 import click
+import sys
 from getpass import getpass
 from moin_cli.xmlrpc_client import WikiRPCClient
 
@@ -18,6 +19,7 @@ def auth():
     """
     try:
         from moin_cli.config import save_config
+        from moin_cli.config.models import Config, Settings, ServerConfig
         from pathlib import Path
         import os
 
@@ -36,16 +38,18 @@ def auth():
         client = WikiRPCClient(endpoint)
         token = client.get_auth_token(username, password)
         
-        # Save complete config with sections
-        config = {
-            'wikis': {
-                alias: {
-                    'url': url,
-                    'username': username,
-                    'token': token
-                }
+        # Create proper config structure with models
+        config = Config(
+            settings=Settings(default_server=alias),
+            servers={
+                alias: ServerConfig(
+                    name=alias,
+                    url=url,
+                    username=username,
+                    access_token=token
+                )
             }
-        }
+        )
         save_config(config)
         click.echo("Configuration saved successfully")
     except Exception as e:
@@ -68,17 +72,28 @@ def get(pagename, server, quiet):
 
 @main.command()
 @click.argument('pagename')
-@click.argument('content')
+@click.argument('content', required=False)
+@click.option('--file', '-f', type=click.File('r'), default='-', help='File to read content from (default: stdin)')
 @click.option('--server', '-s', help='Wiki server alias to use')
-def put(pagename, content, server):
-    """Update a page's content."""
+def put(pagename, content, file, server):
+    """Update a page's content.
+    
+    Content can be provided:
+    - Directly as argument
+    - Via --file option (or stdin by default)
+    """
     try:
+        if content is None:
+            content = file.read()
+            
         client = WikiRPCClient.from_config(server)
         success = client.put_page(pagename, content, alias=server)
         if success:
             click.echo(f"Successfully updated {pagename}")
         else:
             click.echo(f"Failed to update {pagename}", err=True)
+    except click.ClickException as e:
+        raise e
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
 
