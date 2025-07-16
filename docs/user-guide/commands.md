@@ -52,8 +52,8 @@ moin get PageName --format raw|markdown|html|json
 Write content to a wiki page.
 
 ```bash
-# Interactive editor
-moin put PageName
+# Direct content input
+moin put PageName "content goes here"
 
 # From file
 moin put PageName --file content.txt
@@ -62,14 +62,12 @@ moin put PageName --file content.txt
 echo "content" | moin put PageName
 
 # To specific server
-moin put PageName --server work
+moin put PageName "content" --server work
 ```
 
 **Options:**
 - `--server SERVERNAME`: Target server
 - `--file FILE`: Read content from file
-- `--content TEXT`: Direct content input
-- `--editor EDITOR`: Specify editor for interactive mode
 
 #### `moin list`
 List all pages in the wiki.
