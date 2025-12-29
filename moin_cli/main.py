@@ -64,8 +64,6 @@ def get(pagename, server, quiet):
     try:
         client = WikiRPCClient.from_config(server)
         content = client.get_page(pagename)
-        if not quiet:
-            click.echo(f"Retrieved content for {pagename}")
         click.echo(content)
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
