@@ -17,9 +17,46 @@ class WikiRPCClient:
         endpoint = f"{wiki_config.url}/?action=xmlrpc2"
         return cls(endpoint)
 
-    def get_page(self, pagename: str) -> str:
-        """Get page content using WikiRPC v2 getPage."""
+    def get_page(self, pagename: str, revision: Optional[int] = None) -> str:
+        """Get page content using WikiRPC v2 getPage or getPageVersion.
+        
+        Args:
+            pagename: Name of the page to retrieve
+            revision: Optional revision number. If provided, uses getPageVersion.
+        """
+        if revision:
+            return self.server.getPageVersion(pagename, revision)
         return self.server.getPage(pagename)
+
+    def get_page_history(self, pagename: str) -> list[dict]:
+        """Get history of a page using getRecentChangesWithAttributes.
+        
+        Args:
+            pagename: Name of the page to get history for
+            
+        Returns:
+            List of dictionaries containing version information
+        """
+        from datetime import datetime, timedelta
+        # Look back far enough to get history, e.g., 10 years
+        since = datetime.utcnow() - timedelta(days=3650)
+        
+        try:
+            # getRecentChangesWithAttributes(date, pagenames)
+            results = self.server.getRecentChangesWithAttributes(since, [pagename])
+            if not results or not isinstance(results, list):
+                return []
+            
+            # The result is a list of results per pagename. 
+            # Since we requested one pagename, we look at results[0].
+            history = results[0]
+            if not isinstance(history, list):
+                return []
+                
+            return history
+        except Exception:
+            # Fallback or just return empty if method not supported
+            return []
 
     def get_auth_token(self, username: str, password: str) -> str:
         """Get authentication token from MoinMoin server."""

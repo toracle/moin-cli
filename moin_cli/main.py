@@ -1,6 +1,5 @@
 import click
 import sys
-from getpass import getpass
 from moin_cli.xmlrpc_client import WikiRPCClient
 
 @click.group()
@@ -31,7 +30,7 @@ def auth():
         alias = click.prompt("Enter wiki name/alias (e.g. local, production)")
         url = click.prompt("Enter wiki server URL (e.g. http://localhost:8080)")
         username = click.prompt("Enter wiki username")
-        password = getpass("Enter wiki password: ")
+        password = click.prompt("Enter wiki password", hide_input=True)
 
         # Create client and get token
         endpoint = f"{url}/?action=xmlrpc2"
@@ -58,12 +57,33 @@ def auth():
 @main.command()
 @click.argument('pagename')
 @click.option('--server', '-s', help='Wiki server alias to use')
+@click.option('--version', '-v', type=int, help='Specific revision/version of the page')
+@click.option('--history', is_flag=True, help='Show page revision history')
 @click.option('--quiet', '-q', is_flag=True, help='Suppress status messages')
-def get(pagename, server, quiet):
-    """Get a page's content."""
+def get(pagename, server, version, history, quiet):
+    """Get a page's content or history."""
     try:
         client = WikiRPCClient.from_config(server)
-        content = client.get_page(pagename)
+        
+        if history:
+            revisions = client.get_page_history(pagename)
+            if not revisions:
+                click.echo(f"No history found for {pagename}")
+                return
+                
+            # Print header
+            click.echo(f"{'REV':<6} {'DATE':<20} {'AUTHOR':<15} {'COMMENT'}")
+            click.echo("-" * 60)
+            
+            for rev in revisions:
+                v = rev.get('version', 'N/A')
+                d = rev.get('lastModified', 'N/A')
+                a = rev.get('author', 'N/A')
+                c = rev.get('comment', '')
+                click.echo(f"{v:<6} {str(d):<20} {a:<15} {c}")
+            return
+
+        content = client.get_page(pagename, revision=version)
         click.echo(content)
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

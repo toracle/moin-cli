@@ -39,12 +39,20 @@ moin get HomePage
 # Read from specific server
 moin get PageName --server work
 
+# Read specific version/revision
+moin get HomePage --version 5
+
+# Show revision history
+moin get HomePage --history
+
 # Output formatting
 moin get PageName --format raw|markdown|html|json
 ```
 
 **Options:**
 - `--server SERVERNAME`: Target server
+- `--version VERSION`: Specific revision/version number
+- `--history`: Show revision history (list of versions, dates, authors)
 - `--format FORMAT`: Output format
 - `--quiet`: Suppress status messages
 

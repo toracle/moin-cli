@@ -38,6 +38,29 @@ def test_get_command_with_server_config_model():
             mock_server.getPage.assert_called_once_with("FrontPage")
 
 
+def test_get_page_with_revision():
+    """Test that get_page calls getPageVersion when revision is provided."""
+    server_config = ServerConfig(
+        name="test",
+        url="http://localhost:8080/",
+        username="testuser",
+        access_token="test-token-123",
+        verify_ssl=True,
+        timeout=30
+    )
+    
+    with patch('moin_cli.config.get_wiki_config', return_value=server_config):
+        mock_server = Mock()
+        mock_server.getPageVersion.return_value = "Test page version 5 content"
+        
+        with patch('xmlrpc.client.ServerProxy', return_value=mock_server):
+            client = WikiRPCClient.from_config("test")
+            content = client.get_page("FrontPage", revision=5)
+            
+            assert content == "Test page version 5 content"
+            mock_server.getPageVersion.assert_called_once_with("FrontPage", 5)
+
+
 def test_put_page_with_server_config_model():
     """Test that put_page works with ServerConfig Pydantic model.
     
