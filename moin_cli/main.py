@@ -105,7 +105,7 @@ def put(pagename, content, file, server):
             content = file.read()
             
         client = WikiRPCClient.from_config(server)
-        success = client.put_page(pagename, content, alias=server)
+        success = client.put_page(pagename, content)
         if success:
             click.echo(f"Successfully updated {pagename}")
         else:
