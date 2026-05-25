@@ -17,6 +17,9 @@ chrono = "0.4"
 anyhow = "1.0"
 thiserror = "1.0"
 dialoguer = "0.10"
+tempfile = "3.0"
+walkdir = "2.0"
+
 
 [profile.release]
 opt-level = 3

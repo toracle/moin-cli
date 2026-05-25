@@ -4,10 +4,15 @@ use std::path::PathBuf;
 
 mod config;
 mod xmlrpc_client;
+mod updater;
+
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const REPO_URL: &str = "https://github.com/toracle/moin-cli";
 
 #[derive(Parser)]
 #[command(name = "moin-cli")]
 #[command(about = "A Rust CLI for MoinMoin wiki servers via XML-RPC with MCP server support")]
+#[command(version = VERSION)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -17,6 +22,18 @@ struct Cli {
 enum Commands {
     /// Initial setup and authentication for MoinMoin wiki
     Auth,
+    
+    /// Version and update commands
+    #[command(alias = "v")]
+    Version {
+        /// Check for newer version
+        #[arg(short = 'c', long)]
+        check: bool,
+        
+        /// Update to latest version
+        #[arg(short = 'u', long)]
+        update: bool,
+    },
     
     /// Get a page's content or history
     Get {
@@ -94,6 +111,9 @@ async fn main() -> Result<()> {
         Commands::Auth => {
             auth_command().await?;
         },
+        Commands::Version { check, update } => {
+            version_command(check, update).await?;
+        },
         Commands::Get { pagename, server, version, history, quiet } => {
             get_command(pagename, server, version, history, quiet).await?;
         },
@@ -109,6 +129,45 @@ async fn main() -> Result<()> {
         Commands::Recent { days, server } => {
             recent_command(days, server).await?;
         },
+    }
+    
+    Ok(())
+}
+
+async fn version_command(check: bool, update: bool) -> Result<()> {
+    use crate::updater::{check_for_updates, perform_self_update};
+    
+    if update {
+        if check {
+            // Check and update
+            if let Some(release) = check_for_updates().await? {
+                println!("New version available: {}", release.tag_name);
+                perform_self_update(&release).await?;
+                println!("Updated successfully to version {}", release.tag_name);
+            } else {
+                println!("Already up to date (v{})", VERSION);
+            }
+        } else {
+            // Just update without checking
+            if let Some(release) = check_for_updates().await? {
+                perform_self_update(&release).await?;
+                println!("Updated successfully to version {}", release.tag_name);
+            } else {
+                println!("Already up to date (v{})", VERSION);
+            }
+        }
+    } else if check {
+        // Just check for updates
+        if let Some(release) = check_for_updates().await? {
+            println!("New version available: {}", release.tag_name);
+            println!("Current version: {}", VERSION);
+            println!("Run 'moin-cli version --update' to update");
+        } else {
+            println!("Already up to date (v{})", VERSION);
+        }
+    } else {
+        // Just show version
+        println!("moin-cli v{}", VERSION);
     }
     
     Ok(())
