@@ -65,14 +65,14 @@ impl WikiRPCClient {
                 // First apply the auth token
                 let apply_token_req = Request::new("applyAuthToken").arg(token);
                 apply_token_req.call_url(&endpoint)
-                    .map_err(|e| anyhow::anyhow!("applyAuthToken failed: {:?}", e))?;
+                    .map_err(|e| format_xmlrpc_error(&e, &endpoint))?;
                 
                 // Then make our actual request
                 request.call_url(&endpoint)
-                    .map_err(|e| anyhow::anyhow!("Request failed: {:?}", e))
+                    .map_err(|e| format_xmlrpc_error(&e, &endpoint))
             } else {
                 request.call_url(&endpoint)
-                    .map_err(|e| anyhow::anyhow!("Request failed: {:?}", e))
+                    .map_err(|e| format_xmlrpc_error(&e, &endpoint))
             }
         }).await?;
         
@@ -217,5 +217,35 @@ impl WikiRPCClient {
             xmlrpc::Value::Bool(success) => Ok(success),
             _ => Err(anyhow::anyhow!("Unexpected response format for putPage")),
         }
+    }
+}
+
+/// Format XML-RPC errors into user-friendly messages
+fn format_xmlrpc_error(error: &xmlrpc::Error, endpoint: &str) -> anyhow::Error {
+    let error_string = format!("{}", error);
+    
+    // Check if it's a fault
+    if let Some(fault) = error.fault() {
+        return anyhow::anyhow!("XML-RPC Fault {}: {}", fault.fault_code, fault.fault_string);
+    }
+    
+    // Check for common transport errors in the string representation
+    if error_string.contains("Connection refused") || error_string.contains("connect error") || error_string.contains("Connection reset") {
+        anyhow::anyhow!(
+            "Could not connect to wiki server at {}\nPlease check that your MoinMoin server is running and the URL is correct.",
+            endpoint
+        )
+    } else if error_string.contains("404") || error_string.contains("Not Found") {
+        anyhow::anyhow!(
+            "The wiki server at {} does not support XML-RPC or the endpoint is incorrect.\nPlease check your server configuration.",
+            endpoint
+        )
+    } else if error_string.contains("timeout") || error_string.contains("timed out") {
+        anyhow::anyhow!(
+            "Connection to wiki server at {} timed out.\nPlease check your network connection and try again.",
+            endpoint
+        )
+    } else {
+        anyhow::anyhow!("Failed to connect to wiki server at {}: {}", endpoint, error_string)
     }
 }
