@@ -13,8 +13,10 @@ tokio = { version = "1.0", features = ["full"] }
 directories = "5.0"
 config = "0.13"
 toml = "0.5"
+chrono = "0.4"
 anyhow = "1.0"
 thiserror = "1.0"
+dialoguer = "0.10"
 
 [profile.release]
 opt-level = 3
