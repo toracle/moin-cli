@@ -39,7 +39,7 @@ Pre-built binaries for Linux (x86_64, aarch64), macOS (Apple Silicon), and Windo
 First, configure your wiki connection:
 
 ```bash
-moin-cli auth
+moin auth
 ```
 
 This will prompt you for:
@@ -67,44 +67,44 @@ This will prompt you for:
 
 ```bash
 # Get a page
-moin-cli get Home
+moin get Home
 
 # Get page history
-moin-cli get --history Home
+moin get --history Home
 
 # Update a page
-moin-cli put Home "Welcome to my wiki!"
+moin put Home "Welcome to my wiki!"
 
 # Update page from file
-moin-cli put --file welcome.txt Home
+moin put --file welcome.txt Home
 
 # List all pages
-moin-cli list
+moin list
 
 # Search for pages
-moin-cli search "important stuff"
+moin search "important stuff"
 
 # Recent changes
-moin-cli recent --days 7
+moin recent --days 7
 
 # Version and Update
-moin-cli --version          # Show version (standard flag)
-moin-cli version            # Show version
-moin-cli v                  # Show version (short alias)
-moin-cli version --check   # Check for newer version
-moin-cli v -c               # Check for newer version (short)
-moin-cli version --update  # Self-update to latest version
-moin-cli v -u               # Self-update (short)
-moin-cli version --check --update  # Check and update if available
+moin --version          # Show version (standard flag)
+moin version            # Show version
+moin v                  # Show version (short alias)
+moin version --check   # Check for newer version
+moin v -c               # Check for newer version (short)
+moin version --update  # Self-update to latest version
+moin v -u               # Self-update (short)
+moin version --check --update  # Check and update if available
 ```
 
 ## Version Checking and Self-Update
 
-moin-cli includes built-in version checking and self-update capabilities:
+moin includes built-in version checking and self-update capabilities:
 
-- **Version Display**: Use `moin-cli --version`, `moin-cli version`, or `moin-cli v` to display the current version
-- **Update Checking**: Use `moin-cli version --check` to query GitHub for the latest release
-- **Self-Update**: Use `moin-cli version --update` to automatically download and install the latest version
+- **Version Display**: Use `moin --version`, `moin version`, or `moin v` to display the current version
+- **Update Checking**: Use `moin version --check` to query GitHub for the latest release
+- **Self-Update**: Use `moin version --update` to automatically download and install the latest version
 
 The self-update feature:
 - Queries GitHub's releases API to find the latest version

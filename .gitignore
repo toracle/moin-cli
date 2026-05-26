@@ -15,3 +15,5 @@ wheels/
 # Added by cargo
 
 /target
+moin-cli
+moin

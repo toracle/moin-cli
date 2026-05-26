@@ -35,7 +35,7 @@ pub async fn check_for_updates() -> Result<Option<GitHubRelease>> {
     let response = client
         .get(&releases_url)
         .header("Accept", "application/vnd.github.v3+json")
-        .header("User-Agent", "moin-cli/0.1.0")
+        .header("User-Agent", "moin/0.1.0")
         .send()
         .await
         .context("Failed to fetch latest release from GitHub")?;
@@ -123,7 +123,7 @@ pub fn get_platform_download_url(release: &GitHubRelease) -> Result<String> {
             if name.ends_with(".tar.gz") || 
                name.ends_with(".tgz") || 
                name.ends_with(".zip") ||
-               name.contains("moin-cli") {
+               name.contains("moin") {
                 return Ok(asset.browser_download_url.clone());
             }
         }
@@ -141,7 +141,7 @@ pub fn get_platform_download_url(release: &GitHubRelease) -> Result<String> {
                name.ends_with(".tgz") || 
                name.ends_with(".zip") ||
                name.ends_with(".exe") ||
-               name.contains("moin-cli") {
+               name.contains("moin") {
                 return Ok(asset.browser_download_url.clone());
             }
         }
@@ -166,7 +166,7 @@ pub async fn download_file(url: &str, dest: &Path) -> Result<()> {
     
     let mut response = client
         .get(url)
-        .header("User-Agent", "moin-cli/0.1.0")
+        .header("User-Agent", "moin/0.1.0")
         .send()
         .await
         .context("Failed to start download")?;
@@ -233,7 +233,7 @@ fn extract_tar_gz(tarball_path: &Path, dest_dir: &Path) -> Result<PathBuf> {
         let entry = entry?;
         let path = entry.path();
         
-        if path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("moin-cli")) {
+        if path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("moin")) {
             return Ok(path.to_path_buf());
         }
     }
@@ -255,7 +255,7 @@ pub async fn perform_self_update(release: &GitHubRelease) -> Result<()> {
     
     // Determine filename from URL
     let filename = download_url.split('/').last()
-        .unwrap_or("moin-cli.tar.gz");
+        .unwrap_or("moin.tar.gz");
     let download_path = temp_path.join(filename);
     
     // Download the file
@@ -292,7 +292,7 @@ pub async fn perform_self_update(release: &GitHubRelease) -> Result<()> {
     // Ask for confirmation before replacing
     if !Confirm::new()
         .with_prompt(format!(
-            "Replace current moin-cli with v{}?",
+            "Replace current moin with v{}?",
             release.tag_name
         ))
         .default(true)
@@ -381,7 +381,7 @@ fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<PathBuf> {
         let file_name = path.file_name().unwrap_or_default();
         let file_name_str = file_name.to_string_lossy();
         
-        if path.is_file() && (file_name_str == "moin-cli" || file_name_str == "moin-cli.exe") {
+        if path.is_file() && (file_name_str == "moin" || file_name_str == "moin.exe") {
             return Ok(path.to_path_buf());
         }
     }

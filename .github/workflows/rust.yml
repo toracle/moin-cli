@@ -150,10 +150,10 @@ jobs:
         if: matrix.archive_ext == 'tar.gz'
         shell: bash
         run: |
-          ARCHIVE_NAME="moin-cli-${{ matrix.target }}.tar.gz"
-          STAGING="moin-cli-${{ matrix.target }}"
+          ARCHIVE_NAME="moin-${{ matrix.target }}.tar.gz"
+          STAGING="moin-${{ matrix.target }}"
           mkdir -p "$STAGING"
-          cp "target/${{ matrix.target }}/release/moin-cli" "$STAGING/"
+          cp "target/${{ matrix.target }}/release/moin" "$STAGING/"
           tar czf "$ARCHIVE_NAME" "$STAGING"
           echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> "$GITHUB_ENV"
 
@@ -161,17 +161,17 @@ jobs:
         if: matrix.archive_ext == 'zip'
         shell: bash
         run: |
-          ARCHIVE_NAME="moin-cli-${{ matrix.target }}.zip"
-          STAGING="moin-cli-${{ matrix.target }}"
+          ARCHIVE_NAME="moin-${{ matrix.target }}.zip"
+          STAGING="moin-${{ matrix.target }}"
           mkdir -p "$STAGING"
-          cp "target/${{ matrix.target }}/release/moin-cli.exe" "$STAGING/"
+          cp "target/${{ matrix.target }}/release/moin.exe" "$STAGING/"
           7z a "$ARCHIVE_NAME" "$STAGING"
           echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> "$GITHUB_ENV"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: moin-cli-${{ matrix.target }}
+          name: moin-${{ matrix.target }}
           path: ${{ env.ARCHIVE_NAME }}
           retention-days: 1
 

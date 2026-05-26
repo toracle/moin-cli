@@ -8,7 +8,7 @@
 set -e
 
 REPO="toracle/moin-cli"
-BINARY_NAME="moin-cli"
+BINARY_NAME="moin"
 
 # --- Helper functions ---
 

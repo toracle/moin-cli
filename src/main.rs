@@ -10,7 +10,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const REPO_URL: &str = "https://github.com/toracle/moin-cli";
 
 #[derive(Parser)]
-#[command(name = "moin-cli")]
+#[command(name = "moin")]
 #[command(about = "A Rust CLI for MoinMoin wiki servers via XML-RPC with MCP server support")]
 #[command(version = VERSION)]
 struct Cli {
@@ -161,13 +161,13 @@ async fn version_command(check: bool, update: bool) -> Result<()> {
         if let Some(release) = check_for_updates().await? {
             println!("New version available: {}", release.tag_name);
             println!("Current version: {}", VERSION);
-            println!("Run 'moin-cli version --update' to update");
+            println!("Run 'moin version --update' to update");
         } else {
             println!("Already up to date (v{})", VERSION);
         }
     } else {
         // Just show version
-        println!("moin-cli v{}", VERSION);
+        println!("moin v{}", VERSION);
     }
     
     Ok(())
@@ -231,7 +231,7 @@ async fn get_command(pagename: String, server: Option<String>, version: Option<i
         Ok(client) => client,
         Err(e) => {
             eprintln!("Error loading configuration: {}", e);
-            eprintln!("Please run 'moin-cli auth' to set up your wiki connection first.");
+            eprintln!("Please run 'moin auth' to set up your wiki connection first.");
             return Err(e);
         }
     };
@@ -283,7 +283,7 @@ async fn put_command(pagename: String, content: Option<String>, file: Option<Pat
     }
     
     let client = WikiRPCClient::from_config(server)
-        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin-cli auth' first.", e))?;
+        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin auth' first.", e))?;
     
     let success = client.put_page(&pagename, &final_content).await
         .map_err(|e| anyhow::anyhow!("Failed to update page: {}", e))?;
@@ -301,7 +301,7 @@ async fn list_command(server: Option<String>) -> Result<()> {
     use crate::xmlrpc_client::WikiRPCClient;
     
     let client = WikiRPCClient::from_config(server)
-        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin-cli auth' first.", e))?;
+        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin auth' first.", e))?;
     
     let pages = client.get_all_pages().await
         .map_err(|e| anyhow::anyhow!("Failed to get pages: {}", e))?;
@@ -317,7 +317,7 @@ async fn search_command(query: String, server: Option<String>) -> Result<()> {
     use crate::xmlrpc_client::WikiRPCClient;
     
     let client = WikiRPCClient::from_config(server)
-        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin-cli auth' first.", e))?;
+        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin auth' first.", e))?;
     
     let results = client.search_pages(&query).await
         .map_err(|e| anyhow::anyhow!("Failed to search pages: {}", e))?;
@@ -333,7 +333,7 @@ async fn recent_command(days: i32, server: Option<String>) -> Result<()> {
     use crate::xmlrpc_client::WikiRPCClient;
 
     let client = WikiRPCClient::from_config(server)
-        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin-cli auth' first.", e))?;
+        .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin auth' first.", e))?;
 
     let changes = client.get_recent_changes(days).await
         .map_err(|e| anyhow::anyhow!("Failed to get recent changes: {}", e))?;
