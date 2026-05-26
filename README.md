@@ -9,14 +9,14 @@ This is the Rust rewrite of the original Python moin-cli project.
 ### Quick Install (one-liner)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/toracle/moin-cli/rust-conversion/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/toracle/moin-cli/main/install.sh | sh
 ```
 
-Or using cargo directly:
+This will detect your platform, download the latest release binary, and install it to `~/.local/bin`.
 
-```bash
-cargo install --git https://github.com/toracle/moin-cli.git --branch rust-conversion
-```
+### Download from Releases
+
+Pre-built binaries for Linux (x86_64, aarch64), macOS (x86_64, Apple Silicon), and Windows (x86_64) are available on the [GitHub Releases](https://github.com/toracle/moin-cli/releases) page.
 
 ### Manual Installation
 
@@ -29,7 +29,6 @@ cargo install --git https://github.com/toracle/moin-cli.git --branch rust-conver
    ```bash
    git clone https://github.com/toracle/moin-cli.git
    cd moin-cli
-   git checkout rust-conversion
    cargo install --path .
    ```
 
@@ -123,7 +122,6 @@ Configuration is stored in `~/.config/moin-cli/config.toml` (or the appropriate 
 
 ```bash
 # Build
-git checkout rust-conversion
 cargo build
 
 # Run
@@ -142,10 +140,10 @@ cargo clippy
 ## GitHub Actions
 
 The project includes a CI/CD workflow (`.github/workflows/rust.yml`) that:
-- Tests on multiple Rust toolchains (stable, nightly)
-- Runs on multiple platforms (Linux, macOS, Windows)
-- Runs clippy and fmt checks
-- Builds in both debug and release modes
+- Runs format, clippy, build, and test checks on push/PR to main
+- Tests on multiple platforms (Linux, macOS, Windows)
+- Builds cross-platform release binaries on tag push (`v*`)
+- Publishes binaries to GitHub Releases automatically
 
 ## License
 
