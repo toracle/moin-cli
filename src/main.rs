@@ -331,21 +331,29 @@ async fn search_command(query: String, server: Option<String>) -> Result<()> {
 
 async fn recent_command(days: i32, server: Option<String>) -> Result<()> {
     use crate::xmlrpc_client::WikiRPCClient;
-    
+
     let client = WikiRPCClient::from_config(server)
         .map_err(|e| anyhow::anyhow!("Failed to load configuration: {}. Please run 'moin-cli auth' first.", e))?;
-    
-    let pages = client.get_recent_changes(days).await
+
+    let changes = client.get_recent_changes(days).await
         .map_err(|e| anyhow::anyhow!("Failed to get recent changes: {}", e))?;
-    
-    if pages.is_empty() {
+
+    if changes.is_empty() {
         println!("No changes in the last {} days", days);
         return Ok(());
     }
-    
-    for page in pages {
-        println!("{}", page);
+
+    // Print header
+    println!("{:<30} {:<15} {:<8} LAST MODIFIED", "NAME", "AUTHOR", "VERSION");
+    println!("{}", "-".repeat(75));
+
+    for entry in changes {
+        let name = entry.get("name").map(|s| s.as_str()).unwrap_or("N/A");
+        let author = entry.get("author").map(|s| s.as_str()).unwrap_or("N/A");
+        let version = entry.get("version").map(|s| s.as_str()).unwrap_or("N/A");
+        let last_modified = entry.get("lastModified").map(|s| s.as_str()).unwrap_or("N/A");
+        println!("{:<30} {:<15} {:<8} {}", name, author, version, last_modified);
     }
-    
+
     Ok(())
 }

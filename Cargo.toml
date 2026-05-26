@@ -10,6 +10,7 @@ serde_json = "1.0"
 reqwest = { version = "0.11", features = ["json", "blocking"] }
 xmlrpc = "0.15.1"
 tokio = { version = "1.0", features = ["full"] }
+iso8601 = "0.4"
 directories = "5.0"
 config = "0.13"
 toml = "0.5"
