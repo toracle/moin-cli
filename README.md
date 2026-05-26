@@ -1,117 +1,152 @@
-# MoinMoin CLI
+# moin-cli (Rust)
 
-A Python command-line interface for interacting with MoinMoin wiki servers via XML-RPC, with built-in support for serving as an MCP (Model Context Protocol) server for Claude Code.
+A Rust CLI tool for interacting with MoinMoin wiki servers via XML-RPC.
 
-## Features
+This is the Rust rewrite of the original Python moin-cli project.
 
-### CLI Client
-- Connect to MoinMoin wiki servers via XML-RPC
-- Perform wiki operations from the command line
-- Read, write, and manage wiki pages
-- Search and navigate wiki content
-- Multi-server support with secure token authentication
+## Installation
 
-### MCP Server
-- Serve as an MCP server for Claude Code integration
-- Provide wiki content access and manipulation tools
-- Enable AI-assisted wiki content management
-- Support for structured wiki operations
-
-## Quick Start
+### Quick Install (one-liner)
 
 ```bash
-# Install
-git clone <repository-url>
-cd moin-cli
-pip install -e .
-
-# Setup your first server
-moin server add work --url https://wiki.company.com
-moin server set-default work
-
-# Start using
-moin get HomePage
-moin put Documentation
-moin search "installation"
+curl -sSL https://raw.githubusercontent.com/toracle/moin-cli/rust-conversion/install.sh | bash
 ```
 
-## Usage Examples
+Or using cargo directly:
 
-### Basic Operations
 ```bash
-# Read a page
-moin get PageName
+cargo install --git https://github.com/toracle/moin-cli.git --branch rust-conversion
+```
 
-# Edit a page (opens editor)
-moin put PageName
+### Manual Installation
 
-# Write from file
-moin put PageName --file content.txt
+1. Make sure you have [Rust](https://rustup.rs) installed:
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
 
-# Search pages
-moin search "search term"
+2. Clone this repository and install:
+   ```bash
+   git clone https://github.com/toracle/moin-cli.git
+   cd moin-cli
+   git checkout rust-conversion
+   cargo install --path .
+   ```
+
+## Usage
+
+### Setup
+
+First, configure your wiki connection:
+
+```bash
+moin-cli auth
+```
+
+This will prompt you for:
+- Wiki name/alias (e.g., `local`, `production`)
+- Wiki server URL (e.g., `http://localhost:8080`)
+- Username
+- Password
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `auth` | Set up authentication for a MoinMoin wiki |
+| `version` / `v` | Show version, check for updates, or self-update |
+| `get <pagename>` | Get page content |
+| `get --history <pagename>` | Show page revision history |
+| `get --version <n> <pagename>` | Get specific page version |
+| `put <pagename> [content]` | Update page content |
+| `put --file <file> <pagename>` | Update page from file |
+| `list` | List all pages |
+| `search <query>` | Search for pages containing query |
+| `recent [--days N]` | Show recently changed pages |
+
+### Examples
+
+```bash
+# Get a page
+moin-cli get Home
+
+# Get page history
+moin-cli get --history Home
+
+# Update a page
+moin-cli put Home "Welcome to my wiki!"
+
+# Update page from file
+moin-cli put --file welcome.txt Home
 
 # List all pages
-moin list
+moin-cli list
+
+# Search for pages
+moin-cli search "important stuff"
+
+# Recent changes
+moin-cli recent --days 7
+
+# Version and Update
+moin-cli --version          # Show version (standard flag)
+moin-cli version            # Show version
+moin-cli v                  # Show version (short alias)
+moin-cli version --check   # Check for newer version
+moin-cli v -c               # Check for newer version (short)
+moin-cli version --update  # Self-update to latest version
+moin-cli v -u               # Self-update (short)
+moin-cli version --check --update  # Check and update if available
 ```
 
-### Multi-Server Management
-```bash
-# Add multiple servers
-moin server add work --url https://work.wiki.com
-moin server add personal --url https://personal.wiki.com
+## Version Checking and Self-Update
 
-# Use specific server
-moin get HomePage --server personal
+moin-cli includes built-in version checking and self-update capabilities:
 
-# List configured servers
-moin server list
-```
+- **Version Display**: Use `moin-cli --version`, `moin-cli version`, or `moin-cli v` to display the current version
+- **Update Checking**: Use `moin-cli version --check` to query GitHub for the latest release
+- **Self-Update**: Use `moin-cli version --update` to automatically download and install the latest version
 
-### MCP Server for Claude Code
-```bash
-# Start MCP server
-moin serve
-
-# Or with specific settings
-moin serve --host localhost --port 8000 --server work
-```
+The self-update feature:
+- Queries GitHub's releases API to find the latest version
+- Detects your platform automatically (Linux, macOS, Windows)
+- Downloads the appropriate binary for your system
+- Creates a backup of your current binary before updating
+- Asks for confirmation before replacing the current executable
+- Preserves executable permissions on Unix systems
 
 ## Configuration
 
-- **Configuration file**: `~/.moin/config.toml`
-- **Token-based authentication**: Secure, Azure CLI-like authentication flow
-- **Multi-server support**: Manage multiple MoinMoin wiki servers
-- **Environment variables**: Support for automation and CI/CD
+Configuration is stored in `~/.config/moin-cli/config.toml` (or the appropriate location for your OS).
 
-## Documentation
+## Development
 
-📖 **[Complete Documentation](docs/README.md)**
+```bash
+# Build
+git checkout rust-conversion
+cargo build
 
-### Quick Links
-- **[Getting Started](docs/user-guide/getting-started.md)** - Installation and setup
-- **[Commands](docs/user-guide/commands.md)** - Complete command reference  
-- **[Configuration](docs/user-guide/configuration.md)** - Settings and server management
-- **[Architecture](docs/developer/architecture.md)** - Technical design and security
+# Run
+cargo run -- --help
+
+# Test
+cargo test
+
+# Format code
+cargo fmt
+
+# Lint
+cargo clippy
+```
+
+## GitHub Actions
+
+The project includes a CI/CD workflow (`.github/workflows/rust.yml`) that:
+- Tests on multiple Rust toolchains (stable, nightly)
+- Runs on multiple platforms (Linux, macOS, Windows)
+- Runs clippy and fmt checks
+- Builds in both debug and release modes
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
-
-## Roadmap
-
-- [ ] Basic XML-RPC client functionality
-- [ ] CLI interface for common operations
-- [ ] MCP server implementation
-- [ ] Configuration management
-- [ ] Authentication handling
-- [ ] Batch operations
-- [ ] Plugin system for custom operations
+MIT License

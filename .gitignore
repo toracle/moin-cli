@@ -10,3 +10,8 @@ wheels/
 .venv
 .aider*
 .claude/
+
+
+# Added by cargo
+
+/target

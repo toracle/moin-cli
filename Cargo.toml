@@ -1,0 +1,31 @@
+[package]
+name = "moin-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+xmlrpc = "0.15.1"
+tokio = { version = "1.0", features = ["full"] }
+iso8601 = "0.4"
+directories = "5.0"
+config = "0.13"
+toml = "0.5"
+chrono = "0.4"
+anyhow = "1.0"
+thiserror = "1.0"
+dialoguer = "0.10"
+tempfile = "3.0"
+walkdir = "2.0"
+
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.dev]
+opt-level = 1
