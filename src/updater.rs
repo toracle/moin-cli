@@ -1,7 +1,10 @@
 use anyhow::{Context, Result};
 use serde::Deserialize;
 use std::env;
-use std::fs::{self, Permissions};
+use std::fs;
+#[cfg(unix)]
+use std::fs::Permissions;
+#[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
