@@ -82,10 +82,6 @@ map_target() {
             TARGET="aarch64-unknown-linux-gnu"
             ARCHIVE_EXT="tar.gz"
             ;;
-        macos-x86_64)
-            TARGET="x86_64-apple-darwin"
-            ARCHIVE_EXT="tar.gz"
-            ;;
         macos-aarch64)
             TARGET="aarch64-apple-darwin"
             ARCHIVE_EXT="tar.gz"

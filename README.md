@@ -16,7 +16,7 @@ This will detect your platform, download the latest release binary, and install 
 
 ### Download from Releases
 
-Pre-built binaries for Linux (x86_64, aarch64), macOS (x86_64, Apple Silicon), and Windows (x86_64) are available on the [GitHub Releases](https://github.com/toracle/moin-cli/releases) page.
+Pre-built binaries for Linux (x86_64, aarch64), macOS (Apple Silicon), and Windows (x86_64) are available on the [GitHub Releases](https://github.com/toracle/moin-cli/releases) page.
 
 ### Manual Installation
 
