@@ -75,11 +75,11 @@ detect_platform() {
 map_target() {
     case "${PLATFORM}-${ARCH}" in
         linux-x86_64)
-            TARGET="x86_64-unknown-linux-gnu"
+            TARGET="x86_64-unknown-linux-musl"
             ARCHIVE_EXT="tar.gz"
             ;;
         linux-aarch64)
-            TARGET="aarch64-unknown-linux-gnu"
+            TARGET="aarch64-unknown-linux-musl"
             ARCHIVE_EXT="tar.gz"
             ;;
         macos-aarch64)
